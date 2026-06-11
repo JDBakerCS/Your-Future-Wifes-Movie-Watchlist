@@ -90,7 +90,7 @@ function createMovieCard(title, genre) {
   if (genre === "") {
     movieGenre.textContent = "No genre";
   } else {
-    movieGenre.textContent = genre;
+    movieGenre.textContent = ` | ${genre}`;
   }
 
   // Put title and genre inside the info div
@@ -162,7 +162,7 @@ function updateFilterButtons(activeFilter) {
 function applyFilter(filter) {
   // Remember the current filter
   currentFilter = filter;
-
+   console.log("Current filter is:", currentFilter);
   // Update which filter button looks active
   updateFilterButtons(filter);
 
@@ -170,6 +170,9 @@ function applyFilter(filter) {
   const cards = movieList.querySelectorAll(".movie-card");
 
   cards.forEach(function(card) {
+    console.log(
+      "Movie: ", card.textContent, "watched? ", card.classList.contains("watched")
+    );
     if (filter === "all") {
       card.classList.remove("filtered-out");
     } else if (filter === "watched") {
