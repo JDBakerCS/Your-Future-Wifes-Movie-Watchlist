@@ -2,8 +2,10 @@
 
 ## What Is It?
 
-> Are you marrying a wonderful person who is great but just never had the exposure to some GREAT MOVIES? Well, look no further, ol' chap, because what I have here is a semi-certified "Future Wife's Movie Watchlist!" TM Patent Pending. At just the low cost of zero dollars and zero cents. Happy watching!
-This is a playful movie watchlist app for keeping track of the films that absolutely need to be seen. It lets you add movies, sort out what has been watched, clear finished titles, and keep the list looking nice while doing it.
+> Are you marrying a wonderful person who is great but just never had the exposure to some GREAT MOVIES? Well, look no further, ol' chap, because what I have here is a semi-certified "Future Wife's Movie Watchlist!" TM Patent Pending. At just the low cost of zero dollars and zero cents, this lovely gesture can be yours to own!!! 
+Happy watching!
+
+This is your girlfriend/friend/wife/honeydewl/babygirl movie watchlist app for keeping track of the films that absolutely need to be seen. It lets you add movies, sort out what has been watched, clear finished titles, and keep the list looking nice while doing it.
 
 ## What It Does
 
@@ -15,4 +17,5 @@ This is a playful movie watchlist app for keeping track of the films that absolu
 
 ## Why This Version Exists
 
-This version is the personalized copy of the original `movie-watchlist` project. It was made so the design, theme, and future changes could live in their own space without changing the original class version.
+This version is the personalized copy of the original `movie-watchlist` project, given out for instructional use only and so is this, made possible by aghaffar570
+It was made so the design, theme, and future changes could live in their own space without changing the original class version.
