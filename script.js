@@ -1,6 +1,22 @@
 // Phase 1: Connect to the DOM
 // =====================================================
 
+const STORAGE_KEY = "your-future-wifes-movie-watchlist.movies";
+const starterMovies = [
+  { id: "hook", title: "Hook", genre: "Fantasy", watched: false },
+  { id: "goodfellas", title: "Goodfellas", genre: "Crime", watched: false },
+  { id: "waterboy", title: "The Waterboy", genre: "Comedy", watched: false },
+  { id: "trainspotting", title: "Trainspotting", genre: "Drama", watched: false },
+  { id: "requiem", title: "Requiem for a Dream", genre: "Drama", watched: false },
+  { id: "terminator-2", title: "Terminator 2", genre: "Action", watched: false },
+  { id: "stand-by-me", title: "Stand by Me", genre: "Drama", watched: false },
+  { id: "goonies", title: "The Goonies", genre: "Adventure", watched: false },
+  { id: "donnie-darko", title: "Donnie Darko", genre: "Sci-Fi", watched: false },
+  { id: "neverending-story", title: "The NeverEnding Story", genre: "Fantasy", watched: false },
+  { id: "minority-report", title: "Minority Report", genre: "Sci-Fi", watched: false },
+  { id: "pet-semitary", title: "Pet Semitary", genre: "Horror", watched: false }
+];
+
 // Select the title and movie count display
 const appTitle = document.getElementById("app-title");
 const movieCount = document.getElementById("movie-count");
@@ -21,6 +37,7 @@ const filterBtns = document.querySelectorAll(".filter-btn");
 
 // This variable remembers which filter is currently active
 let currentFilter = "all";
+let movies = loadMovies();
 
 // Log everything to make sure selections worked
 console.log("App title:", appTitle);
@@ -37,7 +54,7 @@ console.log("Filter buttons:", filterBtns);
 // =====================================================
 
 // Change the title text
-appTitle.textContent = "My Movie Watchlist";
+appTitle.textContent = "Your Future Wife's Movie Watchlist";
 
 // Read and log the count text
 console.log("Count says:", movieCount.textContent);
@@ -63,16 +80,69 @@ titleInput.setAttribute("required", "");
 // What is the difference between getAttribute("value") and .value on an input?
 // getAttribute("value") → reads the original HTML attribute value, if one exists.
 // .value               → reads what the user actually typed right now.
+
+renderMovies();
+updateCount();
+applyFilter(currentFilter);
+
+function loadMovies() {
+  const savedMovies = localStorage.getItem(STORAGE_KEY);
+
+  if (!savedMovies) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(starterMovies));
+    return starterMovies.slice();
+  }
+
+  try {
+    const parsedMovies = JSON.parse(savedMovies);
+
+    if (Array.isArray(parsedMovies)) {
+      return parsedMovies;
+    }
+  } catch (error) {
+    console.error("Could not load saved movies:", error);
+  }
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(starterMovies));
+  return starterMovies.slice();
+}
+
+function saveMovies() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(movies));
+}
+
+function syncMoviesFromDom() {
+  const cards = movieList.querySelectorAll(".movie-card");
+  const nextMovies = [];
+
+  cards.forEach(function(card) {
+    nextMovies.push({
+      id: card.getAttribute("data-id"),
+      title: card.querySelector(".movie-title").textContent,
+      genre: card.getAttribute("data-genre"),
+      watched: card.classList.contains("watched")
+    });
+  });
+
+  movies = nextMovies;
+  saveMovies();
+}
+
 // Phase 4 Helper: Create a Movie Card
 // =====================================================
 
-function createMovieCard(title, genre) {
+function createMovieCard(title, genre, watched, id) {
   // Create the outer li card
   const card = document.createElement("li");
   card.classList.add("movie-card");
 
-  // Store genre as a data attribute
+  // Store genre and id as data attributes
   card.setAttribute("data-genre", genre);
+  card.setAttribute("data-id", id);
+
+  if (watched) {
+    card.classList.add("watched");
+  }
 
   // Create the movie info div
   const movieInfo = document.createElement("div");
@@ -90,7 +160,7 @@ function createMovieCard(title, genre) {
   if (genre === "") {
     movieGenre.textContent = "No genre";
   } else {
-    movieGenre.textContent = ` | ${genre}`;
+    movieGenre.textContent = `| ${genre}`;
   }
 
   // Put title and genre inside the info div
@@ -104,7 +174,7 @@ function createMovieCard(title, genre) {
   // Create the watched button
   const watchButton = document.createElement("button");
   watchButton.classList.add("watch-btn");
-  watchButton.textContent = "Mark Watched";
+  watchButton.textContent = watched ? "Unmark Watched" : "Mark Watched";
 
   // Create the remove button
   const removeButton = document.createElement("button");
@@ -122,6 +192,22 @@ function createMovieCard(title, genre) {
   // Return the finished card
   return card;
 }
+
+function renderMovies() {
+  movieList.innerHTML = "";
+
+  movies.forEach(function(movie) {
+    const newCard = createMovieCard(
+      movie.title,
+      movie.genre,
+      movie.watched,
+      movie.id
+    );
+
+    movieList.appendChild(newCard);
+  });
+}
+
 // Phase 6 Helper: Update Movie Count
 // =====================================================
 
@@ -136,7 +222,6 @@ function updateCount() {
     movieCount.textContent = `${totalMovies} movies`;
   }
 }
-
 
 // =====================================================
 // Phase 6 Helper: Update Active Filter Button
@@ -154,7 +239,6 @@ function updateFilterButtons(activeFilter) {
   });
 }
 
-
 // =====================================================
 // Phase 6 Helper: Apply Filter
 // =====================================================
@@ -162,7 +246,7 @@ function updateFilterButtons(activeFilter) {
 function applyFilter(filter) {
   // Remember the current filter
   currentFilter = filter;
-   console.log("Current filter is:", currentFilter);
+
   // Update which filter button looks active
   updateFilterButtons(filter);
 
@@ -170,9 +254,6 @@ function applyFilter(filter) {
   const cards = movieList.querySelectorAll(".movie-card");
 
   cards.forEach(function(card) {
-    console.log(
-      "Movie: ", card.textContent, "watched? ", card.classList.contains("watched")
-    );
     if (filter === "all") {
       card.classList.remove("filtered-out");
     } else if (filter === "watched") {
@@ -191,6 +272,14 @@ function applyFilter(filter) {
   });
 }
 
+function createMovieObject(title, genre) {
+  return {
+    id: String(Date.now() + Math.random()),
+    title: title,
+    genre: genre,
+    watched: false
+  };
+}
 
 // =====================================================
 // Phase 3 and 4: Handle Form Submit
@@ -201,18 +290,28 @@ movieForm.addEventListener("submit", function(event) {
   event.preventDefault();
 
   // Read what the user typed
-  const title = titleInput.value;
-  const genre = genreInput.value;
+  const title = titleInput.value.trim();
+  const genre = genreInput.value.trim();
 
-  // Log values to test
-  console.log("Movie title:", title);
-  console.log("Movie genre:", genre);
+  if (title === "") {
+    return;
+  }
 
-  // Create a new movie card
-  const newCard = createMovieCard(title, genre);
+  // Create a new movie object and movie card
+  const newMovie = createMovieObject(title, genre);
+  const newCard = createMovieCard(
+    newMovie.title,
+    newMovie.genre,
+    newMovie.watched,
+    newMovie.id
+  );
 
   // Add the card to the movie list
   movieList.appendChild(newCard);
+
+  // Save the new movie
+  movies.push(newMovie);
+  saveMovies();
 
   // Update the count
   updateCount();
@@ -223,7 +322,6 @@ movieForm.addEventListener("submit", function(event) {
   // Clear the form inputs
   movieForm.reset();
 });
-
 
 // =====================================================
 // Phase 5: Button Behavior with Event Delegation
@@ -248,7 +346,7 @@ movieList.addEventListener("click", function(event) {
   // If Remove button was clicked
   if (event.target.classList.contains("remove-btn")) {
     card.remove();
-
+    syncMoviesFromDom();
     updateCount();
     applyFilter(currentFilter);
   }
@@ -264,10 +362,10 @@ movieList.addEventListener("click", function(event) {
       event.target.textContent = "Mark Watched";
     }
 
+    syncMoviesFromDom();
     applyFilter(currentFilter);
   }
 });
-
 
 // =====================================================
 // Phase 6: Filter Buttons
@@ -283,7 +381,6 @@ filterBtns.forEach(function(btn) {
   });
 });
 
-
 // =====================================================
 // Phase 6: Clear Watched
 // =====================================================
@@ -297,7 +394,7 @@ clearWatchedBtn.addEventListener("click", function() {
     card.remove();
   });
 
-  // Update count and keep current filter active
+  syncMoviesFromDom();
   updateCount();
   applyFilter(currentFilter);
 });
